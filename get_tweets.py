@@ -1,10 +1,11 @@
 import tweepy as tw
 import search_words as sw
+import os
 
-CONSUMER_KEY = 'nb20uNetSa2NbW5q4tcZ4R7jC'
-CONSUMER_SECRET = '7Cv1YiAQ8UywFlnV3yPPWtqGdcO0YhGCbFj4hGEbjZtN5MwUYS'
-ACCESS_TOKEN = '52314137-BFN0TuBACsP0klUof7E2Gnkll1ouYZQ7PIULTlIiZ'
-ACCESS_TOKEN_SECRET = 'PjJqIuMHDv223716kMR3d5wJ3J8aHh6ysjYdt97n7K7Bi'
+CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
+CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
+ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
+ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 
 
 def get_twitter_auth(consumer_key, consumer_secret, access_token, access_token_secret):
