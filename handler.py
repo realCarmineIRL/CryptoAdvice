@@ -11,14 +11,10 @@ import logging
 from datetime import datetime
 import boto3
 
-# CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
-CONSUMER_KEY = 'nb20uNetSa2NbW5q4tcZ4R7jC'
-# CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
-CONSUMER_SECRET = '7Cv1YiAQ8UywFlnV3yPPWtqGdcO0YhGCbFj4hGEbjZtN5MwUYS'
-# ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
-ACCESS_TOKEN = '52314137-BFN0TuBACsP0klUof7E2Gnkll1ouYZQ7PIULTlIiZ'
-# ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
-ACCESS_TOKEN_SECRET = 'PjJqIuMHDv223716kMR3d5wJ3J8aHh6ysjYdt97n7K7Bi'
+CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
+CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
+ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
+ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -32,7 +28,7 @@ def get_twitter_auth(consumer_key, consumer_secret, access_token, access_token_s
     return auth
 
 def get_words():
-    words = "bitcoin+good -filter:retweets"
+    words = "bitcoin -filter:retweets"
     return words
 
 
@@ -48,19 +44,19 @@ def get_tweets(auth, search_words, num_tweets, lang="en"):
 
 def get_tweet_sentiment(tweets):
     logger.info("creating csv")
-    tweet_analysis = [[tweet.full_text.replace('\n',''), tweet.created_at, TextBlob(tweet.full_text).sentiment.polarity, TextBlob(tweet.full_text).sentiment.subjectivity] for tweet in tweets]
+    tweet_analysis = [[tweet.full_text.replace('"','').replace('\n',''), tweet.created_at, TextBlob(tweet.full_text).sentiment.polarity, TextBlob(tweet.full_text).sentiment.subjectivity] for tweet in tweets]
     return tweet_analysis
 
 def run(event, context):
     logger.info("Creating CSV")
-    date = datetime.today().strftime('%Y%m%d')
+    date = datetime.today().strftime('%Y%m%d%H%M')
     file_name = "tweets_{}.csv".format(date)
     filepath = '/tmp/'
     key = "year={}/month={}/day={}/{}".format(date[0:4], date[4:6], date[6:8], file_name)
     tw_auth = get_twitter_auth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     query = get_words()
     header = 'tweet, time, polarity, subjetivity'
-    tweets = get_tweet_sentiment(get_tweets(tw_auth, query, 10))
+    tweets = get_tweet_sentiment(get_tweets(tw_auth, query, 200))
     np.savetxt(filepath + file_name, tweets, delimiter=",", fmt='"%s"', header=header)
     logger.info("Uploading to S3")
     bucket_resource.upload_file(
