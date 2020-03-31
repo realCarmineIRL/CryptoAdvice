@@ -56,7 +56,7 @@ def run(event, context):
     date = datetime.today().strftime('%Y%m%d')
     file_name = "tweets_{}.csv".format(date)
     filepath = '/tmp/'
-    key = "{}/{}/{}/{}".format(date[0:4], date[4:6], date[6:8], file_name)
+    key = "year={}/month={}/day={}/{}".format(date[0:4], date[4:6], date[6:8], file_name)
     tw_auth = get_twitter_auth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     query = get_words()
     header = 'tweet, time, polarity, subjetivity'
