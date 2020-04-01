@@ -1,0 +1,24 @@
+{
+  "name": "tweet-sentiment",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Carmine",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless-python-requirements": "^5.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://realCarmineIRL@github.com/realCarmineIRL/CryptoAdvice.git"
+  },
+  "bugs": {
+    "url": "https://github.com/realCarmineIRL/CryptoAdvice/issues"
+  },
+  "homepage": "https://github.com/realCarmineIRL/CryptoAdvice#readme",
+  "dependencies": {},
+  "description": ""
+}

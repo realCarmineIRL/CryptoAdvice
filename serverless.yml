@@ -1,0 +1,30 @@
+service: crypto-advice-tweets
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+    zip: true
+    slim: true
+    useDownloadCache: true
+    useStaticCache: true
+
+provider:
+  name: aws
+  region: eu-west-1
+  runtime: python3.7
+  environment:
+    CONSUMER_KEY: ${ssm:/dev/crypto/consumer_key}
+    CONSUMER_SECRET: ${ssm:/dev/crypto/consumer_secret}
+    ACCESS_TOKEN: ${ssm:/dev/crypto/access_token}
+    ACCESS_TOKEN_SECRET: ${ssm:/dev/crypto/access_token_secret}
+
+functions:
+  cron:
+    memorySize: 256
+    timeout: 60
+    handler: handler.run
+    events:
+      - schedule: cron(0/30 * * * ? *)
