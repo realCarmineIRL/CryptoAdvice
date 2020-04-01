@@ -2,6 +2,7 @@ service: crypto-advice-tweets
 
 plugins:
   - serverless-python-requirements
+  - serverless-prune-plugin
 
 custom:
   pythonRequirements:
@@ -10,6 +11,9 @@ custom:
     slim: true
     useDownloadCache: true
     useStaticCache: true
+  prune:
+    automatic: true
+    number: 3
 
 provider:
   name: aws
