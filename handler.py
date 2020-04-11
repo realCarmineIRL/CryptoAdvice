@@ -5,11 +5,10 @@ except ImportError:
 
 import tweepy as tw
 from textblob import TextBlob
-import os
-import numpy as np
 import logging
-from datetime import datetime
-import boto3
+import os
+import psycopg2
+
 
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
@@ -19,8 +18,6 @@ ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-s3 = boto3.client("s3")
-bucket_resource = s3
 
 def get_twitter_auth(consumer_key, consumer_secret, access_token, access_token_secret):
     auth = tw.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -44,23 +41,24 @@ def get_tweets(auth, search_words, num_tweets, lang="en"):
 
 def get_tweet_sentiment(tweets):
     logger.info("creating csv")
-    tweet_analysis = [[tweet.full_text.replace('"','').replace('\n',''), tweet.created_at, TextBlob(tweet.full_text).sentiment.polarity, TextBlob(tweet.full_text).sentiment.subjectivity] for tweet in tweets]
-    return tweet_analysis
+    tweet_analysis = [TextBlob(tweet.full_text).sentiment.polarity > 0 for tweet in tweets]
+    score = sum(tweet_analysis) / len(tweet_analysis)
+    return score
 
 def run(event, context):
-    logger.info("Creating CSV")
-    date = datetime.today().strftime('%Y%m%d%H%M')
-    file_name = "tweets_{}.csv".format(date)
-    filepath = '/tmp/'
-    key = "year={}/month={}/day={}/{}".format(date[0:4], date[4:6], date[6:8], file_name)
+    logger.info("starting")
     tw_auth = get_twitter_auth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     query = get_words()
-    header = 'tweet, time, polarity, subjetivity'
-    tweets = get_tweet_sentiment(get_tweets(tw_auth, query, 200))
-    np.savetxt(filepath + file_name, tweets, delimiter=",", fmt='"%s"', header=header)
-    logger.info("Uploading to S3")
-    bucket_resource.upload_file(
-        Bucket='crypto-advice-tweets',
-        Filename= filepath + file_name,
-        Key=key
-    )
+    polarity = get_tweet_sentiment(get_tweets(tw_auth, query, 200))
+    logger.info(polarity)
+    connection = psycopg2.connect(user = "ifqhkeevsenmek",
+                                  password = "d4379a8cf1896eef9977b943d46b551c890ebb47be25ba1888b67595e84be41b",
+                                  host = "ec2-46-137-177-160.eu-west-1.compute.amazonaws.com",
+                                  port = "5432",
+                                  database = "dapeujevpredau")
+    cursor = connection.cursor()
+    upd = f'UPDATE sentiments SET score = {polarity * 100} where id = 1'
+    cursor.execute(upd)
+    connection.commit()
+    cursor.close()
+    connection.close()
