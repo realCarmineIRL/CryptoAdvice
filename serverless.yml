@@ -24,6 +24,11 @@ provider:
     CONSUMER_SECRET: ${ssm:/dev/crypto/consumer_secret}
     ACCESS_TOKEN: ${ssm:/dev/crypto/access_token}
     ACCESS_TOKEN_SECRET: ${ssm:/dev/crypto/access_token_secret}
+    PG_USER: ${ssm:/dev/crypto/pg_user}
+    PG_PASS: ${ssm:/dev/crypto/pg_pass}
+    PG_HOST: ${ssm:/dev/crypto/pg_host}
+    PG_PORT: ${ssm:/dev/crypto/pg_port}
+    PG_DB: ${ssm:/dev/crypto/pg_db}
 
 functions:
   cron:
@@ -31,4 +36,4 @@ functions:
     timeout: 60
     handler: handler.run
     events:
-      - schedule: cron(0/30 * * * ? *)
+      - schedule: cron(0/3 * * * ? *)

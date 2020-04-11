@@ -15,6 +15,12 @@ CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 
+PG_USER = os.environ.get('PG_USER')
+PG_PASS = os.environ.get('PG_PASS')
+PG_HOST = os.environ.get('PG_HOST')
+PG_PORT = os.environ.get('PG_PORT')
+PG_DB = os.environ.get('PG_DB')
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -51,11 +57,11 @@ def run(event, context):
     query = get_words()
     polarity = get_tweet_sentiment(get_tweets(tw_auth, query, 200))
     logger.info(polarity)
-    connection = psycopg2.connect(user = "ifqhkeevsenmek",
-                                  password = "d4379a8cf1896eef9977b943d46b551c890ebb47be25ba1888b67595e84be41b",
-                                  host = "ec2-46-137-177-160.eu-west-1.compute.amazonaws.com",
-                                  port = "5432",
-                                  database = "dapeujevpredau")
+    connection = psycopg2.connect(user = PG_USER,
+                                  password = PG_PASS,
+                                  host = PG_HOST,
+                                  port = PG_PORT,
+                                  database = PG_DB)
     cursor = connection.cursor()
     upd = f'UPDATE sentiments SET score = {polarity * 100} where id = 1'
     cursor.execute(upd)
